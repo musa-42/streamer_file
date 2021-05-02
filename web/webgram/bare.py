@@ -11,9 +11,6 @@ import io
 import re
 import os.path
 import requests
-from contextlib import redirect_stdout
-from subprocess import PIPE, STDOUT, Popen
-from telethon.tl.types import InputFile
 from telethon.sessions import StringSession
 
 
@@ -28,11 +25,4 @@ class BareServer(Config, StreamTools, Streamer, Checkers):
             self.config.API_HASH,
             loop=loop
         ).start(bot_token=self.config.BOT_TOKEN)
-        
-        self.client2 = telethon.TelegramClient(
-            StringSession(), #self.config.SESS_NAME2,
-            self.config.APP_ID,
-            self.config.API_HASH,
-            loop=loop
-        ).start(bot_token=self.config.BOT_TOKEN2)
-        
+       
