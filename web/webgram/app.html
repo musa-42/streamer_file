@@ -1,0 +1,285 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+
+<head>
+    <meta charset="UTF-8">
+    <title>test upload by chunk</title>
+    <style>
+
+html {
+  height: 100%;
+}
+
+body {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: center;
+  align-items: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+  margin: 0;
+  height: 100%;
+  width: 100%;
+  background: rgb(201, 76, 76);
+  font-family: Nunito;
+  color: #888;
+}
+
+a {
+  color: #51ADED;
+}
+
+.fileUpload {
+  /*
+  &:before, &:after {
+    content: '';
+    position: absolute;
+    top: -20px;
+    left: 0;
+    width: 100%;
+    height: 20px;
+    @include scallop($formBgColor);
+  }
+  &:after {
+    top: auto;
+    bottom: -20px;
+    background-position: 0 -15px;
+  }*/
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
+  background-color: #EEF2F6;
+  width: 60%;
+  height: auto;
+  padding: 100px;
+  position: relative;
+  text-align: center;
+}
+.fileUpload h4 {
+  font-size: 30px;
+  text-align: center;
+  font-weight: normal;
+  margin: 20px 0 5px 0;
+  padding: 0;
+}
+.fileUpload progress {
+  appearance: none;
+  border: 0;
+  width: 100%;
+  height: 15px;
+  color: #51ADED;
+  background-color: #ccc;
+  border-radius: 10px;
+}
+.fileUpload progress::-moz-progress-bar {
+  background-color: #51ADED;
+  border-radius: 10px;
+}
+.fileUpload progress::-webkit-progress-bar {
+  background-color: #ccc;
+  border-radius: 10px;
+}
+.fileUpload progress::-webkit-progress-value {
+  position: relative;
+  background-color: #51ADED;
+  border-radius: 10px;
+}
+.fileUpload p {
+  font-size: 100%;
+  padding: 10px;
+  margin: 0;
+  text-align: center;
+  word-wrap: break-word;
+}
+.fileUpload .fileElem {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  width: 100%;
+  position: relative;
+  top: 30px;
+  left: 30px;
+  z-index: 1;
+  height: 50px;
+  opacity: 0;
+}
+.fileUpload .fileElem:focus {
+  outline: none;
+}
+.fileUpload .fileSelect {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  display: inline-block;
+  text-align: center;
+  width: 100%;
+  height: 50px;
+  background-color: #51ADED;
+  border-radius: 3px;
+  border-bottom: 3px solid rgba(0, 0, 0, 0.1);
+  position: relative;
+  font-size: 30px;
+  line-height: 50px;
+  color: white;
+}
+.fileUpload .fileSelect:before {
+  font-family: Entypo;
+  content: '\E711';
+  position: absolute;
+  top: 0;
+  left: 80px;
+}
+    </style>
+</head>
+
+<body>
+<!-- partial:index.partial.html -->
+<div class="fileUpload">
+<h4><b>چی دوست داری اپلود کی ؟</b></h4>
+  <input type="file" id="file" class="fileElem">
+  <label for="file" class="fileSelect">SELECT File</label>
+  <h4>Progress</h4>
+  <progress id="progress" value="50" max="100"></progress>
+  <p id="status"> 1 B .. 2 GB UPLOAD FILE</p>
+  <p id="link"></p>
+</div>
+<!-- partial -->
+
+    <script>
+        (function() {
+          
+            var f = document.getElementById('file');
+			      var status = document.getElementById('status');
+            var progress = document.getElementById("progress")
+            var link = document.getElementById("link")
+
+            if (f.files.length)
+                processFile();
+
+            f.addEventListener('change', processFile, false);
+
+            function randomFILE_ID(min = -9223372036854775808, max = 9223372036854775807) {
+                return Math.random() * (max - min) + min;
+            }
+
+            function bytesToSize(bytes) {
+              var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+              if (bytes == 0) return '0 Byte';
+              var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+              return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
+            }
+
+
+            function processFile(e) {
+                var file = f.files[0];
+                var filename = f.files[0].name;
+                var size = file.size;
+                var sliceSize = 524288;
+                var start = 0;
+                var parts = ((size + sliceSize - 1) / sliceSize) | 0 ;
+                var part = 0;
+                var file_id = randomFILE_ID();
+                link.innerHTML = "";
+                status.innerText = "uploading ...";
+
+                console.log('Sending File of Size: ' + size);
+
+                if ( size <= 2097152000 && size > 1024*1024*10){
+                    send_big(file, 0, sliceSize, part, parts, file_id, filename,size);
+                }
+                else if ( size <= 1024*1024*10 && size > 0) {
+                    sliceSize = size;
+                    send(file, 0, sliceSize,filename)
+                }
+                else {
+                    status.innerText = "if file size  2GB >= size > 0";
+                }
+
+            }
+
+            function send(file, start, end,filename) {
+                var formdata = new FormData();
+                var xhr = new XMLHttpRequest();
+
+                xhr.open('POST', '/upload', true);
+
+                var slicedPart = slice(file, start, end);
+
+                formdata.append('start', start);
+                formdata.append('end', end);
+                formdata.append('file', slicedPart);
+                formdata.append('filename', filename);
+                xhr.addEventListener("load", reqListener);
+
+                console.log('Sending Chunk (Start - End): ' + start + ' ' + end);
+                xhr.send(formdata);
+
+            }
+
+
+            function send_big(file, start, end, part, parts, file_id, filename,size) {
+                var formdata = new FormData();
+                var xhr = new XMLHttpRequest();
+                var sliceSize = 524288;
+
+                if (size - end < 0) { // Uses a closure on size here you could pass this as a param
+                    end = size;
+                }
+                if (end < size) {
+                    xhr.onreadystatechange = function () {
+                        if (xhr.readyState == XMLHttpRequest.DONE) {
+                            console.log('Done Sending Chunk');
+                            part += 1
+                            send_big(file, start + sliceSize, start + (sliceSize * 2), part, parts, file_id, filename,size )
+                        }
+                    }
+                } else {
+                    console.log('Upload complete');
+                }
+
+                xhr.open('POST', '/upload_big', true);
+
+                var slicedPart = slice(file, start, end);
+
+                formdata.append('start', start);
+                formdata.append('end', end);
+                formdata.append('part', part);
+                formdata.append('parts', parts);
+                formdata.append('file', slicedPart);
+                formdata.append('filename', filename);
+                formdata.append('file_id', file_id);
+				formdata.append('size', size);
+                xhr.addEventListener("load", reqListener);
+
+                console.log('Sending Chunk (Start - End): ' + start + ' ' + end);
+                xhr.send(formdata);
+
+            }
+
+            function reqListener () {
+                data = this.responseText.split(" ")
+                console.log(this.responseText);
+                if (data[2] == "link"){
+                  status.innerText = `${bytesToSize(data[0])} out of ${bytesToSize(data[1])} ( 100% )`;
+                  progress.value = 100;
+                  link.innerHTML = `link download = ( <a href="${data[3]}">${data[3]}</a> )`
+                }else{
+                  status.innerText = `${bytesToSize(data[0])} out of ${bytesToSize(data[1])} ( ${data[2]}% )`;
+                  progress.value = data[2];
+                }
+            }
+
+            function slice(file, start, end) {
+                var slice = file.mozSlice ? file.mozSlice :
+                    file.webkitSlice ? file.webkitSlice :
+                    file.slice ? file.slice : noop;
+                return slice.bind(file)(start, end);
+            }
+
+            function noop() {
+
+            }
+
+        })();
+    </script>
+</body>
+
+</html>

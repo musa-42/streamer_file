@@ -1,0 +1,23 @@
+version: "2"
+
+services:
+
+  bot:
+    build: ./bot
+    restart: always
+    command: python3 main.py
+
+  web:
+    build: ./web
+    restart: always
+    command: gunicorn main:main --workers=3 --threads=3 --bind 0.0.0.0:$PORT --worker-class aiohttp.GunicornWebWorker
+    ports:
+      - 8080:8080
+
+  nginx:
+    build: ./nginx
+    restart: always
+    ports:
+      - 80:80
+    depends_on: 
+      - web
