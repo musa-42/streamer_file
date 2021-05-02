@@ -9,9 +9,9 @@ install :
 
 </pre>
 
-[demo](t.me/dlstar)
+[demo](https://t.me/dlstar)
 
-[telegram_channel](t.me/userlandapp)
+[telegram_channel](https://t.me/userlandapp)
 
 
 
