@@ -1,6 +1,6 @@
 # dlstar
 
-install:
+install:  
     - add config keys in config.py /bot/webgram/ , /web/webgram/
     - install docker & docker-compose
     - `docker-compose build`
