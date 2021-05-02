@@ -9,7 +9,7 @@ install :
 
 </pre>
 
-[demo](https://t.me/dlstar)
+[demo](https://t.me/dlstarbot)
 
 [telegram_channel](https://t.me/userlandapp)
 
