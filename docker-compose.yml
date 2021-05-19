@@ -10,7 +10,7 @@ services:
   web:
     build: ./web
     restart: always
-    command: gunicorn main:main --workers=3 --threads=3 --bind 0.0.0.0:$PORT --worker-class aiohttp.GunicornWebWorker
+    command: gunicorn main:main --workers=3 --threads=3 --bind 0.0.0.0:8080 --worker-class aiohttp.GunicornWebWorker
     ports:
       - 8080:8080
 
