@@ -22,19 +22,11 @@ donate ❤️
 IRR:
 https://idpay.ir/musa-zadeh
 
-PayPal:
-https://paypal.me/musazade
 
 BTC :
 bc1qwzmljwvcpvq6r6r37s7r6gadypaf00attmkdzj
 
-Smart chain / ETH / ERC20:
+Smart chain BNB / BEP20 / ETH / ERC20:
 0x145221676232C93B730845cF24de4E5C156b994C
-
-TRX / USDT / TRC20 :
-TQaRh6AmrXWhmy4gk8RGMQC2mcbSePpfoH
-
-Doge :
-DJtDgKuJa9CoWxduEmyqDdgGPgkD9xSu9p
 
 </pre>
